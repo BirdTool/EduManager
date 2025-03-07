@@ -1,11 +1,13 @@
 import { Button } from "./style"
 
-function signUpButton(buttonName: string = "Entrar") {
-    return (
-        <div>
-            <Button>{buttonName}</Button>
-        </div>
-    )
+interface SignUpButtonProps {
+    onClick: () => void;
 }
 
-export default signUpButton
+const SignUpButton: React.FC<SignUpButtonProps> = ({ onClick }) => {
+    return (
+        <Button onClick={onClick}>Entrar</Button>
+    );
+};
+
+export default SignUpButton;

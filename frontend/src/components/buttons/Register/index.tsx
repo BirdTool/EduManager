@@ -1,11 +1,13 @@
 import { Button } from "./style"
 
-function registerButton(buttonName: string = "Registrar-se") {
+interface RegisterButtonsProps {
+    onClick: () => void;
+}
+
+const RegisterButton: React.FC<RegisterButtonsProps> = ({ onClick }) => {
     return (
-        <div>
-            <Button>{buttonName}</Button>
-        </div>
+        <Button onClick={onClick}>Registrar-se</Button>
     )
 }
 
-export default registerButton
+export default RegisterButton

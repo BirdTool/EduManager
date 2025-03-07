@@ -1,7 +1,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import Home from './pages/Home/index';
 import { createGlobalStyle } from 'styled-components';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home/index';
+import Register from './pages/Register/index';
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -19,6 +21,12 @@ const GlobalStyle = createGlobalStyle`
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <GlobalStyle />
-    <Home />
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+          <Route path="/register" element={<Register />} />
+        </Routes>
+      </Router>
   </StrictMode>,
+  
 )

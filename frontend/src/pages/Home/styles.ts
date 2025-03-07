@@ -46,8 +46,6 @@ export const Description = styled.p`
     padding: 20px;
 `
 
-// Buttons
-
 export const ButtonContainer = styled.div`
     display: flex;
     margin-top: 5%;
