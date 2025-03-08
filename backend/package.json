@@ -11,5 +11,8 @@
   "scripts": {
     "dev": "bun run src/index.ts",
     "start": "bun ."
+  },
+  "dependencies": {
+    "hono": "^4.7.4"
   }
 }
