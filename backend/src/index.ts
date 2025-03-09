@@ -7,6 +7,13 @@ const app = new Hono()
 
 const API_SECRET_KEY = process.env.TOKEN || 'default_secret_key'
 
+app.use(
+    cors({
+      origin: 'http://localhost:5173', // Apenas seu site pode fazer requisições
+      credentials: true, // Se precisar de cookies para autenticação
+    })
+)
+
 // ✅ Middleware para exigir o token principal
 const apiTokenMiddleware = async (c: any, next: () => Promise<void>) => {
   const requestToken = c.req.header('x-api-key') // O token vem no header
@@ -24,12 +31,6 @@ app.get('/', (c) => {
   return c.text('Hello Hono!')
 })
 
-app.use(
-    cors({
-      origin: 'http://localhost:5173', // Apenas seu site pode fazer requisições
-      credentials: true, // Se precisar de cookies para autenticação
-    })
-)
 
 app.route('/login', login)
 app.route('/register', register)

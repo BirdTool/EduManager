@@ -1,6 +1,7 @@
 # FrontEnd
 
 frontend/node_modules
+frontend/.env
 
 # BackEnd
 

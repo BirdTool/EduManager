@@ -1,8 +1,45 @@
+import axios from 'axios';
 import * as styles from './styles';
 import { useState } from 'react';
 
+interface LoginResponse {
+    success: boolean;
+    message: string;
+    data: {
+        name: string;
+        matricula: string;
+        csrfToken: string;
+    };
+}
+
 function Register() {
     const [selectedType, setSelectedType] = useState<string | null>(null);
+    const [name, setName] = useState<string>('');
+    const [matricula, setMatricula] = useState<string>('');
+
+    const handleLogin = async () => {
+        try {
+            const response = await axios.put<LoginResponse>(
+                'http://localhost:3000/login/student',
+                { name, matricula },
+                {
+                    headers: {
+                        'x-api-key': import.meta.env.VITE_TOKEN,
+                    },
+                    withCredentials: true,
+                }
+            );
+            if (response.data.success) {
+                alert('Login bem-sucedido');
+            } else {
+                console.log(response.data.message);
+                alert(response.data.message);
+            }
+        } catch (err) {
+            console.log(err);
+            alert('Erro ao fazer login');
+        }
+    };
 
     const renderForm = () => {
         switch (selectedType) {
@@ -10,9 +47,19 @@ function Register() {
                 return (
                     <styles.Formulary>
                         <h2>Registro de Aluno</h2>
-                        <styles.Input type="text" placeholder="Nome completo" />
-                        <styles.Input type="text" placeholder="Matrícula" />
-                        <styles.Button>Registrar como Aluno</styles.Button>
+                        <styles.Input
+                            type="text"
+                            placeholder="Nome completo"
+                            value={name} // Vincula o valor ao estado
+                            onChange={(e) => setName(e.target.value)} // Atualiza o estado
+                        />
+                        <styles.Input
+                            type="text"
+                            placeholder="Matrícula"
+                            value={matricula} // Vincula o valor ao estado
+                            onChange={(e) => setMatricula(e.target.value)} // Atualiza o estado
+                        />
+                        <styles.Button onClick={handleLogin}>Registrar como Aluno</styles.Button>
                     </styles.Formulary>
                 );
             case 'teacher':
@@ -43,7 +90,7 @@ function Register() {
     };
 
     return (
-        <styles.Container>            
+        <styles.Container>
             <h1>Registro</h1>
             <br />
             <p>Escolha o tipo de registro</p>
