@@ -10,11 +10,6 @@ export const registerSchemaTeacher = z.object({
   name: z.string()
     .min(3, 'Nome deve ter no mínimo 3 caracteres')
     .regex(/^[A-Za-zÀ-ÿ\s]+$/, 'Nome deve conter apenas letras'),
-  age: z.number()
-    .int('Idade deve ser um número inteiro')
-    .positive('Idade deve ser positiva')
-    .min(18, 'Idade mínima é 18 anos')
-    .max(100, 'Idade máxima é 100 anos'),
   gender: z.enum(['masculino', 'feminino'], {
     errorMap: () => ({ message: 'Gênero deve ser masculino ou feminino' })
   }),
@@ -40,12 +35,7 @@ export const registerSchemaStudent = z.object({
   gender: z.enum(['masculino', 'feminino'], {
     errorMap: () => ({ message: 'Gênero deve ser masculino ou feminino' })
   }),
-  age: z.number()
-    .int('Idade deve ser um número inteiro')
-    .positive('Idade deve ser positiva')
-    .max(21, 'Idade máxima é 21 anos'),
   birthday: z.string()
-    .datetime('Data de nascimento inválida'),
 });
 
 export const registerSchemaMajor = z.object({
@@ -58,11 +48,6 @@ export const registerSchemaMajor = z.object({
   name: z.string()
     .min(3, 'Nome deve ter no mínimo 3 caracteres')
     .regex(/^[A-Za-zÀ-ÿ\s]+$/, 'Nome deve conter apenas letras'),
-  age: z.number()
-    .int('Idade deve ser um número inteiro')
-    .positive('Idade deve ser positiva')
-    .min(18, 'Idade mínima é 18 anos')
-    .max(100, 'Idade máxima é 100 anos'),
   gender: z.enum(['masculino', 'feminino'], {
     errorMap: () => ({ message: 'Gênero deve ser masculino ou feminino' })
   }),
