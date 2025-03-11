@@ -4,6 +4,7 @@ import { createGlobalStyle } from 'styled-components';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home/index';
 import Register from './pages/Register/index';
+import Login from './pages/Login/index';
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -25,6 +26,7 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route path="/" element={<Home />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </Router>
   </StrictMode>,
