@@ -10,11 +10,11 @@ const API_SECRET_KEY = process.env.TOKEN || 'default_secret_key'
 app.use(
     cors({
       origin: 'http://localhost:5173', // Apenas seu site pode fazer requisições
-      credentials: true, // Se precisar de cookies para autenticação
+      credentials: true,
     })
 )
 
-// ✅ Middleware para exigir o token principal
+// Middleware para exigir o token principal
 const apiTokenMiddleware = async (c: any, next: () => Promise<void>) => {
   const requestToken = c.req.header('x-api-key') // O token vem no header
 

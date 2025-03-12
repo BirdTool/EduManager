@@ -14,12 +14,10 @@ export const registerSchemaTeacher = z.object({
     errorMap: () => ({ message: 'Gênero deve ser masculino ou feminino' })
   }),
   phone: z.string()
-    .min(10, 'Telefone deve ter no mínimo 10 dígitos')
+    .min(8, 'Telefone deve ter no mínimo 8 dígitos')
     .regex(/^\d+$/, 'Telefone deve conter apenas números'),
-  matery: z.string()
-    .min(1, 'Matéria é obrigatória'),
+  matery: z.array(z.string().min(1, 'Disciplina deve ter no mínimo 1 caractere')),
   birthday: z.string()
-    .datetime('Data de nascimento inválida'),
 });
 
 export const registerSchemaStudent = z.object({
@@ -30,15 +28,17 @@ export const registerSchemaStudent = z.object({
     .email('Email inválido')
     .min(1, 'Email é obrigatório'),
   phone: z.string()
-    .min(10, 'Telefone deve ter no mínimo 10 dígitos')
+    .min(8, 'Telefone deve ter no mínimo 8 dígitos')
     .regex(/^\d+$/, 'Telefone deve conter apenas números'),
   gender: z.enum(['masculino', 'feminino'], {
     errorMap: () => ({ message: 'Gênero deve ser masculino ou feminino' })
   }),
-  birthday: z.string()
+  birthday: z.string(),
+  parent1: z.string().max(100, 'O nome tem muitos caracteres!'),
+  parent2: z.string().max(100, 'O nome tem muitos caracteres!').optional()
 });
 
-export const registerSchemaMajor = z.object({
+export const registerSchemaManagement = z.object({
   email: z.string()
     .email('Email inválido')
     .min(1, 'Email é obrigatório'),
@@ -52,10 +52,9 @@ export const registerSchemaMajor = z.object({
     errorMap: () => ({ message: 'Gênero deve ser masculino ou feminino' })
   }),
   phone: z.string()
-    .min(10, 'Telefone deve ter no mínimo 10 dígitos')
+    .min(8, 'Telefone deve ter no mínimo 8 dígitos')
     .regex(/^\d+$/, 'Telefone deve conter apenas números'),
   role: z.string()
     .min(1, 'Cargo é obrigatório'),
   birthday: z.string()
-    .datetime('Data de nascimento inválida'),
 });

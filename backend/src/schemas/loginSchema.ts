@@ -10,7 +10,7 @@ export const loginSchemaStudent = z.object({
   matricula: z.string().min(8, "A matrícula deve ter pelo menos 8 caracteres")
 });
 
-export const loginSchemaMajor = z.object({
+export const loginSchemaManagament = z.object({
   email: z.string().email("O email deve ser um endereço de email válido"),
   password: z.string().min(6, "A senha deve conter no mínimo 6 digitos"),
 });
