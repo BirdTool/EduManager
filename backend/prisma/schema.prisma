@@ -15,14 +15,16 @@ datasource db {
 
 model records {
   id            Int      @id @default(autoincrement())
-  responsavel   String
-  motivo   String
-  tipo   String
-  data     DateTime @default(now())
+  responsavel   String   // Nome ou ID do responsável, seja professor ou gestor
+  motivo        String
+  tipo          String
+  data          DateTime @default(now())
+  dias          Int?
+
   studentid     Int
   student       students  @relation(fields: [studentid], references: [id])
-  dias        Int?
 }
+
 
 model students {
   id           Int       @id @default(autoincrement())
@@ -37,4 +39,27 @@ model students {
   responsavel2 String?   @db.VarChar(100)
   classe       String?   @db.VarChar(20)
   records      records[]
+}
+
+model teachers {
+  id          Int       @id @default(autoincrement())
+  nome        String    @db.VarChar(100)
+  telefone    String    @db.VarChar(12)
+  email       String    @db.VarChar(100)
+  senha       String    @db.VarChar(255)
+  genero      String    @db.VarChar(10)
+  aniversario DateTime  @db.Date
+  disciplinas Json      @default("[]")
+  classes     Json      @default("[]")
+}
+
+model management {
+  id          Int       @id @default(autoincrement())
+  nome        String    @db.VarChar(100)
+  telefone    String    @db.VarChar(12)
+  email       String    @db.VarChar(100)
+  senha       String    @db.VarChar(255)
+  genero      String    @db.VarChar(10)
+  aniversario DateTime  @db.Date
+  cargo       String    @db.VarChar(20)
 }
