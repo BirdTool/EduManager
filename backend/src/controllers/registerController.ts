@@ -23,7 +23,7 @@ export const registerController = async (c: Context) => {
                         ocorrencias JSONB DEFAULT '[]',
                         suspensoes JSONB DEFAULT '[]',
                         responsavel1 VARCHAR(100) NOT NULL,
-                        responsavel2 VARCHAR(100) DEFAULT NULL
+                        responsavel2 VARCHAR(100) DEFAULT NULL,
                         classe VARCHAR(20) DEFAULT NULL
                     );
                 `);

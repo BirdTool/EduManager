@@ -1,11 +1,23 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import * as jwt from 'jsonwebtoken';
 import login from './routes/login';
 import register from './routes/register';
+import student from './routes/students';
+import root from './routes/private/root';
+import record from './routes/records';
 
-const app = new Hono()
+type CustomBindings = {
+  Bindings: {};
+  Variables: {
+    user: any;
+  };
+};
 
-const API_SECRET_KEY = process.env.TOKEN || 'default_secret_key'
+const app = new Hono<CustomBindings>()
+
+const API_SECRET_KEY = process.env.TOKEN || 'default_secret_key';
+const jwt_TOKEN = process.env.SECRET_KEY || 'default_secret_key'; 
 
 app.use(
     cors({
@@ -27,6 +39,19 @@ const apiTokenMiddleware = async (c: any, next: () => Promise<void>) => {
 
 app.use('*', apiTokenMiddleware)
 
+app.use('/protected/*', async (c, next) => {
+  const token = c.req.header('Cookie')?.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+  if (!token) return c.json({ success: false, message: 'Nenhum token fornecido' }, 401);
+
+  try {
+    const decoded = jwt.verify(token, jwt_TOKEN);
+    c.set('user', decoded);
+    await next();
+  } catch (error) {
+    return c.json({ success: false, message: 'Token inválido ou expirado' }, 401);
+  }
+});
+
 app.get('/', (c) => {
   return c.text('Hello Hono!')
 })
@@ -34,5 +59,10 @@ app.get('/', (c) => {
 
 app.route('/login', login)
 app.route('/register', register)
+
+app.route('/api', student)
+app.route('/api', record)
+
+app.route('/root', root)
 
 export default app

@@ -1,33 +1,22 @@
 export default interface Student {
     id: number;
-    name: string;
+    nome: string;
+    genero: 'masculino' | 'feminino';
     matricula: string | null;
-    age: number;
-    nascimento: string;
+    aniversario: string;
     notas: Notas[];
-    advertencias: Advertencia[];
-    ocorrencias: Ocorrencia[];
-    suspensoes: Suspensao[];
+    advertencias: string[];
+    ocorrencias: string[];
+    suspensoes: string[];
+    responsavel1: string;
+    responsavel2: string;
+    email: string;
+    telefone: string;
+    classe: string;
 }
 
 interface Notas {
     matéria: string;
     bimestre: 1 | 2 | 3 | 4;
     nota: number;
-}
-
-interface Advertencia {
-    data: string;
-    motivo: string;
-}
-
-interface Ocorrencia {
-    data: string;
-    motivo: string;
-}
-
-interface Suspensao {
-    data: string;
-    motivo: string;
-    dias: number;
 }
