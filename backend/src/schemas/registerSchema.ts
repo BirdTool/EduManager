@@ -33,7 +33,9 @@ export const registerSchemaStudent = z.object({
   gender: z.enum(['masculino', 'feminino'], {
     errorMap: () => ({ message: 'Gênero deve ser masculino ou feminino' })
   }),
-  birthday: z.string(),
+  birthday: z.string().regex(/^\d{1,2}\/\d{1,2}\/\d{4}$/, {
+    message: "Data deve estar no formato DD/MM/AAAA"
+  }),
   parent1: z.string().max(100, 'O nome tem muitos caracteres!'),
   parent2: z.string().max(100, 'O nome tem muitos caracteres!').optional()
 });

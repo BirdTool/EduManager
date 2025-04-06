@@ -19,9 +19,6 @@ export const registerController = async (c: Context) => {
                         genero VARCHAR(10) NOT NULL,
                         telefone VARCHAR(15) NOT NULL,
                         notas JSONB DEFAULT '[]',
-                        advertencias JSONB DEFAULT '[]',
-                        ocorrencias JSONB DEFAULT '[]',
-                        suspensoes JSONB DEFAULT '[]',
                         responsavel1 VARCHAR(100) NOT NULL,
                         responsavel2 VARCHAR(100) DEFAULT NULL,
                         classe VARCHAR(20) DEFAULT NULL

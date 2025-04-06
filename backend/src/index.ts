@@ -6,6 +6,15 @@ import register from './routes/register';
 import student from './routes/students';
 import root from './routes/private/root';
 import record from './routes/records';
+import pool from './services/db';
+
+// Test database connection
+pool.query('SELECT NOW()')
+  .then(() => console.log('Database connection successful'))
+  .catch(err => {
+    console.error('Database connection failed:', err);
+    process.exit(1);
+  });
 
 type CustomBindings = {
   Bindings: {};
