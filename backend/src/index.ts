@@ -8,6 +8,7 @@ import root from './routes/private/root';
 import record from './routes/records';
 import pool from './services/db';
 import search from './routes/search';
+import teacher from './routes/teacher';
 
 // Test database connection
 pool.query('SELECT NOW()')
@@ -72,6 +73,7 @@ app.route('/register', register)
 
 app.route('/api', student)
 app.route('/api', record)
+app.route('api', teacher)
 app.route('search', search)
 
 app.route('/root', root)
