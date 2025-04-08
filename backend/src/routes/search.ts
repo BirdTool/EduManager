@@ -6,6 +6,8 @@ import { searchTeacherByAllInfos } from "../controllers/search/searchTeacher";
 import { searchManagementByName } from "../controllers/search/searchManagementByName";
 import { searchManagementByAllInfos } from "../controllers/search/searchManagement";
 import { searchAll } from "../controllers/search/searchAll";
+import { searchRecordsByStudentName } from "../controllers/records/search/recordsByStudent";
+import { searchRecordsByResponsibleName } from "../controllers/records/search/recordsByResponsible";
 
 const search = new Hono();
 
@@ -19,5 +21,8 @@ search.get('/management/name', searchManagementByName);
 search.get('/management/all', searchManagementByAllInfos);
 
 search.get('/all', searchAll);
+
+search.get('records/student', searchRecordsByStudentName);
+search.get('records/responsible', searchRecordsByResponsibleName)
 
 export default search;

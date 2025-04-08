@@ -73,8 +73,8 @@ app.route('/register', register)
 
 app.route('/api', student)
 app.route('/api', record)
-app.route('api', teacher)
-app.route('search', search)
+app.route('/api', teacher)
+app.route('/search', search)
 
 app.route('/root', root)
 

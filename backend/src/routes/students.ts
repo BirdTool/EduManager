@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { getStudent, getStudents } from "../controllers/students/getStudents";
+import { getStudents } from "../controllers/students/getStudents";
 import { postStudent } from "../controllers/students/postStudent";
 import { putStudent } from "../controllers/students/putStudent";
 import { deleteStudent } from "../controllers/students/deleteStudent";
@@ -9,7 +9,7 @@ import { postStudentRecord } from "../controllers/students/records/postStudentRe
 const student = new Hono();
 
 student.get('/students', getStudents);
-student.get('/students/:id', getStudent);
+student.get('/students/:id', getStudents);
 student.post('/students', postStudent);
 student.put('/students/:id', putStudent);
 student.delete('/students/:id', deleteStudent);

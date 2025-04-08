@@ -1,39 +1,86 @@
 import { Context } from 'hono'
-import pool from '../../../services/db';
+import { PrismaClient } from '@prisma/client'
+import { z } from 'zod'
+
+const prisma = new PrismaClient()
+
+const dataObject = z.object({
+    reasson: z.string({
+        required_error: "Reason is required",
+        invalid_type_error: "Reason must be a string"
+    }),
+    responsible: z.string({
+        required_error: "Responsible is required",
+        invalid_type_error: "Responsible must be a string"
+    }),
+    time: z.number({
+        invalid_type_error: "Time must be a number"
+    }).optional()
+})
 
 export const postStudentRecord = async (c: Context) => {
     const type = c.req.param('type');
     const target = c.req.param('id');
     const body = await c.req.json();
+    const validatedData = dataObject.safeParse(body);
 
-    const { reasson, responsible, time } = body;
+    if (!validatedData.success) {
+        return c.json({ message: "Error, invalid data", errors: validatedData.error.errors }, 400)
+    }
+
+    const { reasson, responsible, time } = validatedData.data;
     const date = new Date().toISOString();
 
     try {
         switch (type) {
             case "occurrence": {
-                const poolQ = await pool.query(
-                    `INSERT INTO records (studentid, tipo, motivo, responsavel, data) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-                    [target, type, reasson, responsible, date]
-                );
+                const record = await prisma.records.create({
+                    data: {
+                        studentid: Number(target),
+                        tipo: 'ocorrencia',
+                        motivo: reasson,
+                        responsavel: responsible,
+                        data: date
+                    }
+                });
     
-                return c.json({ message: `Succefull post ocurrence in the student ${poolQ.rows[0].studentid}`, data: poolQ.rows });
+                return c.json({ 
+                    message: `Succefull post ocurrence in the student ${record.studentid}`, 
+                    data: [record] 
+                });
             }
             case "warning": {
-                const poolQ = await pool.query(
-                    `INSERT INTO records (studentid, tipo, motivo, responsavel, data) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-                    [target, type, reasson, responsible, date]
-                );
+                const record = await prisma.records.create({
+                    data: {
+                        studentid: Number(target),
+                        tipo: 'advertencia',
+                        motivo: reasson,
+                        responsavel: responsible,
+                        data: date
+                    }
+                });
     
-                return c.json({ message: `Succefull post warning in the student ${poolQ.rows[0].studentid}`, data: poolQ.rows });
+                return c.json({ 
+                    message: `Succefull post warning in the student ${record.studentid}`, 
+                    data: [record] 
+                });
             }
             case "suspension": {
-                const poolQ = await pool.query(
-                    `INSERT INTO records (studentid, tipo, motivo, responsavel, data, dias) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-                    [target, type, reasson, responsible, date, time]
-                );
+                const record = await prisma.records.create({
+                    data: {
+                        studentid: Number(target),
+                        tipo: 'suspensao',
+                        motivo: reasson,
+                        responsavel: responsible,
+                        data: date,
+                        dias: time
+                    }
+                });
     
-                return c.json({ message: `Succefull post suspension in the student ${poolQ.rows[0].studentid}`, data: poolQ.rows });
+                return c.json({ 
+                    message: `Succefull post suspension in the student ${record.studentid}`, 
+                    data: [record] 
+                });
             }
             default: return c.json({ message: "this type does not existing" }, 404);
         }

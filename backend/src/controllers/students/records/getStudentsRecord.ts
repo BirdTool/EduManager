@@ -1,5 +1,7 @@
 import { Context } from 'hono'
-import pool from '../../../services/db'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 export const getStudentsRecord = async (c: Context) => {
     const studentId = c.req.param('id');
@@ -8,32 +10,51 @@ export const getStudentsRecord = async (c: Context) => {
     try {
         switch(type) {
             case "warnings": {
-                const warnings = await pool.query(`SELECT * FROM records WHERE studentid = $1 AND tipo = $2`, [studentId, "advertencia"]);
+                const warnings = await prisma.records.findMany({
+                    where: {
+                        studentid: Number(studentId),
+                        tipo: "advertencia"
+                    },
+                });
             
-                if (!warnings || warnings.rowCount === 0) return c.json({ message: "Error, this student does not existing or do not have acidents" }, 404)
+                if (!warnings || warnings.length === 0) return c.json({ message: "Error, this student does not existing or do not have acidents" }, 404)
             
-                return c.json(warnings.rows)
+                return c.json(warnings)
             }
             case "occurences": {
-                const occurences = await pool.query(`SELECT * FROM records WHERE studentid = $1 AND tipo = $2`, [studentId, "ocorrencia"]);
+                const occurences = await prisma.records.findMany({
+                    where: {
+                        studentid: Number(studentId),
+                        tipo: "ocorrencia"
+                    }
+                });
     
-                if (!occurences || occurences.rowCount === 0) return c.json({ message: "Error, this student does not existing or do not have acidents" }, 404)
+                if (!occurences || occurences.length === 0) return c.json({ message: "Error, this student does not existing or do not have acidents" }, 404)
     
-                return c.json(occurences.rows)
+                return c.json(occurences)
             }
             case "suspensions": {
-                const suspensions = await pool.query(`SELECT * FROM records WHERE studentid = $1 AND tipo = $2`, [studentId, "suspensao"]);
+                const suspensions = await prisma.records.findMany({
+                    where: {
+                        studentid: Number(studentId),
+                        tipo: "suspensao"
+                    }
+                });
     
-                if (!suspensions || suspensions.rowCount === 0) return c.json({ message: "Error, this student does not existing or do not have acidents" }, 404)
+                if (!suspensions || suspensions.length === 0) return c.json({ message: "Error, this student does not existing or do not have acidents" }, 404)
                
-                return c.json(suspensions.rows)
+                return c.json(suspensions)
             }
             case "all": {
-                const records = await pool.query(`SELECT * FROM records WHERE studentid = $1`, [studentId]);
+                const records = await prisma.records.findMany({
+                    where: {
+                        studentid: Number(studentId)
+                    }
+                });
     
-                if (!records || records.rowCount === 0) return c.json({ message: "Error, this student does not existing or do not have acidents" }, 404)
+                if (!records || records.length === 0) return c.json({ message: "Error, this student does not existing or do not have acidents" }, 404)
                
-                return c.json(records.rows)
+                return c.json(records)
             }
             default: {
                 return c.json({ message: "this type does not existing" }, 404)

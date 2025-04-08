@@ -1,31 +1,119 @@
 import { Context } from "hono";
-import pool from "../../services/db";
 import { registerSchemaStudent } from "../../schemas/registerSchema";
 import Student from "../../types/studentType";
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+// Helper function to convert DD/MM/YYYY to ISO date format with time
+function convertToISODate(dateString: string): string {
+    if (!dateString) return '';
+    
+    // Parse the date parts
+    const [day, month, year] = dateString.split('/').map(part => parseInt(part, 10));
+    
+    // Validate month and day ranges before creating Date object
+    if (month < 1 || month > 12) {
+        throw new Error(`Mês inválido: ${month}. Deve estar entre 1 e 12.`);
+    }
+    
+    // Check days in month
+    const daysInMonth = new Date(year, month, 0).getDate();
+    if (day < 1 || day > daysInMonth) {
+        throw new Error(`Dia inválido: ${day}. ${getMonthName(month)} tem ${daysInMonth} dias.`);
+    }
+    
+    // Create a new Date object (note: month is 0-indexed in JavaScript Date)
+    const date = new Date(year, month - 1, day);
+    
+    // Return the full ISO string (with time component)
+    return date.toISOString();
+}
+
+// Helper function to get month name in Portuguese
+function getMonthName(month: number): string {
+    const monthNames = [
+        "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+        "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+    ];
+    return monthNames[month - 1];
+}
 
 export const postStudent = async (c: Context) => {
     try {
         const body = await c.req.json();
+
+        if (!body) return c.text("Error, no data provided", 400);
     
         const data = registerSchemaStudent.safeParse(body);
     
-        if (!data.success) return c.json({ success: false, message: 'Dados inválidos', errors: data.error.errors }, 400);
+        if (!data.success) return c.json({ 
+            success: false, 
+            message: 'Dados inválidos', 
+            errors: data.error.errors 
+        }, 400);
+        
         const { name, email, phone, birthday, gender, parent1, parent2 } = data.data;
+
+        // Convert birthday to ISO format
+        let formattedBirthday;
+        try {
+            formattedBirthday = birthday ? convertToISODate(birthday) : null;
+        } catch (error) {
+            return c.json({ 
+                success: false, 
+                message: error instanceof Error ? error.message : 'Data de aniversário inválida'
+            }, 400);
+        }
+
+        const ifExist = await prisma.students.findMany({
+            where: {
+                nome: name,
+                email: email
+            }
+        });
     
-        const ifExist = await pool.query(`SELECT * FROM students WHERE nome = $1 AND email = $2`, [name, email]);
+        if (ifExist.length > 0) return c.json({ 
+            success: false, 
+            message: 'Estudante já cadastrado' 
+        }, 400);
+        
+        const currentYear = new Date().getFullYear();
+        
+        // First create the student without matricula
+        const student = await prisma.students.create({
+            data: {
+                email,
+                nome: name,
+                telefone: phone,
+                aniversario: formattedBirthday || '',
+                genero: gender,
+                responsavel1: parent1,
+                responsavel2: parent2,
+                // Temporarily set a placeholder matricula
+                matricula: 'temporary'
+            }
+        });
+        
+        // Now update the student with the correct matricula using their actual ID
+        const updatedStudent = await prisma.students.update({
+            where: { id: student.id },
+            data: {
+                matricula: `${currentYear}-1-${student.id}`
+            }
+        });
     
-        if (ifExist.rows.length > 0) return c.json({ success: false, message: 'Estudante já cadastrado' }, 400);
-    
-        const student: Student = (await pool.query(`INSERT INTO students (nome, email, telefone, aniversario, genero, responsavel1, responsavel2) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`, 
-            [name, email, phone, birthday, gender, parent1, parent2])).rows[0];
-    
-        const matricula = `${new Date().getFullYear()}-1-${student.id}`;
-    
-        await pool.query(`UPDATE students SET matricula = $1 WHERE id = $2`, [matricula, student.id]);
-    
-        return c.json({ success: true, message: 'Estudante cadastrado com sucesso', student });
+        return c.json({ 
+            success: true, 
+            message: 'Estudante cadastrado com sucesso', 
+            student: updatedStudent 
+        });
     } catch (error) {
         console.error('Error registering student:', error);
-        return c.json({ message: "a error occurred while registering the student" }, 500);
+        return c.json({ 
+            success: false,
+            message: "Um erro ocorreu ao cadastrar o estudante",
+            error: error instanceof Error ? error.message : String(error)
+        }, 500);
     }
 }
