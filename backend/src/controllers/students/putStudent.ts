@@ -33,7 +33,7 @@ export const putStudent = async (c: Context) => {
                 responsavel1: parent1 || existingStudent.responsavel1,
                 responsavel2: parent2 || existingStudent.responsavel2,
                 notas: notes || existingStudent.notas,
-                classe: classe || existingStudent.classe,
+                classroomId: classe || existingStudent.classroomId,
                 matricula: matricula || existingStudent.matricula
             }
         });

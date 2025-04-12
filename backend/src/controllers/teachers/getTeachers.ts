@@ -1,5 +1,7 @@
 import { Context } from 'hono'
-import pool from '../../services/db';
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 export const getTeachers = async (c: Context) => {
     try {
@@ -7,17 +9,21 @@ export const getTeachers = async (c: Context) => {
 
         if (id) {
             const idNumber = Number.parseInt(id);
-            const teacher = await pool.query('SELECT * FROM teachers WHERE id = $1', [idNumber]);
+            const teacher = await prisma.teachers.findUnique({
+                where: {
+                    id: idNumber
+                }
+            })
 
-            if (teacher && teacher.rowCount === 0) {
+            if (!teacher) {
                 return c.json({ error: 'Teacher not found' }, 404);
             }
 
-            return c.json(teacher.rows[0])
+            return c.json(teacher)
         } else {
-            const teachers = await pool.query('SELECT * FROM teachers');
+            const teachers = await prisma.teachers.findMany();
     
-            return c.json(teachers.rows);
+            return c.json(teachers);
         }
     } catch (error) {
         console.error(error);

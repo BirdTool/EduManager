@@ -8,6 +8,7 @@ import { searchManagementByAllInfos } from "../controllers/search/searchManageme
 import { searchAll } from "../controllers/search/searchAll";
 import { searchRecordsByStudentName } from "../controllers/records/search/recordsByStudent";
 import { searchRecordsByResponsibleName } from "../controllers/records/search/recordsByResponsible";
+import { searchLeassons } from "../controllers/search/searchLeassons";
 
 const search = new Hono();
 
@@ -19,6 +20,9 @@ search.get('/teacher/all', searchTeacherByAllInfos);
 
 search.get('/management/name', searchManagementByName);
 search.get('/management/all', searchManagementByAllInfos);
+
+search.get('/leassons', searchLeassons);
+search.get('/leassons/:classroomid', searchLeassons);
 
 search.get('/all', searchAll);
 

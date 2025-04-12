@@ -23,11 +23,11 @@ export const searchManagementByAllInfos = async (c: Context) => {
         });
 
         if (management.length === 0) {
-            return c.json({ message: 'Nenhum professor encontrado' }, 404);
+            return c.json({ message: 'Nenhum funcionario encontrado' }, 404);
         }
 
         return c.json({
-            message: 'Professores encontrados com sucesso',
+            message: 'funcionarios encontrados com sucesso',
             data: management,
             count: management.length
         }, 200);
