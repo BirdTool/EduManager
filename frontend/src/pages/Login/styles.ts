@@ -45,6 +45,7 @@ export const Formulary = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 20px;
 `
 
 export const Input = styled.input`
@@ -53,7 +54,6 @@ export const Input = styled.input`
     padding: 14px;
     border: #ffffff;
     border-radius: 10px;
-    margin-top: 20px;
 `
 
 export const Button = styled.button`
@@ -63,7 +63,6 @@ export const Button = styled.button`
     border-radius: 10px;
     padding: 8px;
     transition: all 0.3s ease;
-    margin-top: 20px;
     &:hover {
         background-color: #ffffff;
         color: #0b0b0b;
@@ -73,10 +72,59 @@ export const Button = styled.button`
     }
 `
 
-export const ErrorInput = styled.p`
-    margin-top: 5px;
+export const Select = styled.select`
+    color: #ffffff;
+    background-color: #232323;
+    padding: 14px;
+    border: 1px solid #444;
+    border-radius: 10px;
+    width: 100%;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    
+    option {
+        padding: 16px;
+        background-color: #333333;
+        color: #ffffff;
+        border: none;
+    }
+
+    &:hover {
+        border-color: #666;
+        background-color: #2a2a2a;
+    }
+
+    &::-ms-expand {
+        display: none;
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px #ffffff33;
+        border-color: #666;
+    }
+`
+
+export const FormGroup = styled.div`
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+`
+
+export const Label = styled.label`
+    color: #ffffff;
+    font-size: 14px;
+    margin-left: 4px;
+`
+
+export const ErrorMessage = styled.span`
+    color: #ff4444;
     font-size: 12px;
-    color: #ff0000;
-    font-weight: bold;
-    border: #ffffff;
+    margin-left: 4px;
 `
