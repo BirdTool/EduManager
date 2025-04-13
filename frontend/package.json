@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/playfair-display": "^5.2.5",
     "@types/node": "^22.13.10",
     "axios": "^1.8.2",
     "dotenv": "^16.4.7",

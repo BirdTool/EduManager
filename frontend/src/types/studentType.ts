@@ -1,33 +1,51 @@
-export default interface Student {
+export interface Student {
     id: number;
-    name: string;
-    matricula: string | null;
-    age: number;
-    nascimento: string;
-    notas: Notas[];
-    advertencias: Advertencia[];
-    ocorrencias: Ocorrencia[];
-    suspensoes: Suspensao[];
-}
-
-interface Notas {
-    matéria: string;
-    bimestre: 1 | 2 | 3 | 4;
-    nota: number;
-}
-
-interface Advertencia {
-    data: string;
+    nome: string;
+    matricula?: string;
+    aniversario: string; // ISO format (DateTime)
+    email: string;
+    genero: string;
+    telefone: string;
+    notas: any[]; // ou um tipo mais específico se você souber a estrutura dos itens
+  
+    responsavel1: string;
+    responsavel2?: string;
+  
+    classroomId?: number;
+    classroom?: Classroom;
+  
+    records: Record[];
+    absences: Absence[];
+  }
+  
+  interface Record {
+    id: number;
+    responsavel: string;
     motivo: string;
-}
-
-interface Ocorrencia {
-    data: string;
-    motivo: string;
-}
-
-interface Suspensao {
-    data: string;
-    motivo: string;
-    dias: number;
-}
+    tipo: string;
+    data: string; // ISO format
+    dias?: number;
+  
+    studentid: number;
+    student?: Student;
+  }
+  
+  interface Absence {
+    id: number;
+    lessonId: number;
+    studentId: number;
+  
+    lesson?: Lesson;
+    student?: Student;
+  }
+  
+  interface Classroom {
+    id: number;
+    // Outros campos relevantes para a sala de aula
+  }
+  
+  interface Lesson {
+    id: number;
+    // Outros campos relevantes para a aula
+  }
+  

@@ -168,19 +168,19 @@ function Register() {
 
     return (
         <styles.Container>
-            <h1>Registro</h1>
+            <h1>Login</h1>
             <br />
-            <p>Escolha o tipo de registro</p>
+            <p>Escolha o tipo de Login</p>
             <br />
             <styles.TypeForumulary>
                 <styles.ButtonTypeFormulary onClick={() => setSelectedType('student')}>
-                    Registrar-se como aluno
+                    Logar como aluno
                 </styles.ButtonTypeFormulary>
                 <styles.ButtonTypeFormulary onClick={() => setSelectedType('teacher')}>
-                    Registrar-se como professor
+                    Logar como professor
                 </styles.ButtonTypeFormulary>
                 <styles.ButtonTypeFormulary onClick={() => setSelectedType('staff')}>
-                    Registrar-se como funcionário maior
+                    Logar como funcionário maior
                 </styles.ButtonTypeFormulary>
             </styles.TypeForumulary>
             <br />

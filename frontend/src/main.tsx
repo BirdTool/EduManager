@@ -4,8 +4,9 @@ import { createGlobalStyle } from 'styled-components';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home/index';
 import Login from './pages/Login/index';
-import StudentDashboard from './pages/student/dashboard';
+import StudentDashboard from './pages/student/dashboard/index';
 import axios from 'axios';
+import StudentCertificate from './pages/student/atestado';
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -32,6 +33,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/student/dashboard" element={<StudentDashboard />} />
+        <Route path="/student/atestado" element={<StudentCertificate />} />
       </Routes>
     </Router>
   </StrictMode>

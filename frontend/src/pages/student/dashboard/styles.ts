@@ -1,162 +1,193 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const Container = styled.div`
-  background-color: transparent; /* Agora transparente pois o body já tem o fundo escuro */
-  min-height: 100vh;
-  padding: 1.5rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  font-family: Arial, sans-serif;
-  color: #333333;
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    width: 100%;
 `;
 
-export const StudentHeader = styled.div`
-  margin-bottom: 2rem;
-  background-color: white;
-  padding: 1.5rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-`;
-
-export const StudentName = styled.h1`
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-`;
-
-export const StudentInfo = styled.p`
-  color: #666;
-  margin-bottom: 0.25rem;
-`;
-
-export const GridContainer = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-  position: relative;
-  
-  /* Sombra verde mais visível */
-  &::after {
-    content: '';
+export const CardContent = styled.div`
     position: absolute;
-    top: -10px;
-    left: -10px;
-    right: -10px;
-    bottom: -10px;
-    background: transparent;
-    border-radius: 1rem;
-    z-index: -1;
-    box-shadow: 0 0 25px rgba(0, 255, 128, 0.4);
-    pointer-events: none;
-  }
-  
-  @media (min-width: 768px) {
-    grid-template-columns: 1fr 1fr;
+    top: 10vh;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0 5vh;
+    overflow-y: auto;
+    max-height: 80%;
+    padding-right: 10px;
     
-    &::after {
-      left: -15px;
-      right: -15px;
+    &::-webkit-scrollbar {
+        width: 8px;
     }
-  }
-`;
-
-export const Card = styled.div`
-  background-color:rgb(19, 19, 19);
-  padding: 1.5rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 0 15px rgba(0, 128, 0, 0.4);
-  position: relative;
-  z-index: 1;
-`;
-
-export const CardTitle = styled.h2`
-  font-size: 1.25rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-  color: #2563eb;
-`;
-
-export const ClassList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-`;
-
-export const ClassItem = styled.div`
-  border-bottom: 1px solid #eee;
-  padding-bottom: 0.75rem;
-`;
-
-export const ClassSubject = styled.h3`
-  font-weight: 600;
-`;
-
-export const ClassInfo = styled.p`
-  font-size: 0.875rem;
-  color: #666;
-`;
-
-export const RecordSection = styled.div`
-  margin-bottom: 1rem;
-`;
-
-export const RecordTitle = styled.h3<{ type: 'warning' | 'occurrence' | 'suspension' }>`
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: ${props => {
-    switch (props.type) {
-      case 'warning': return '#ca8a04';
-      case 'occurrence': return '#ea580c';
-      case 'suspension': return '#dc2626';
-      default: return '#333';
+    
+    &::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
     }
-  }};
-`;
-
-export const RecordList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-`;
-
-export const RecordItem = styled.div<{ type: 'warning' | 'occurrence' | 'suspension' }>`
-  padding: 0.75rem;
-  border-radius: 0.375rem;
-  background-color: ${props => {
-    switch (props.type) {
-      case 'warning': return '#fefce8';
-      case 'occurrence': return '#fff7ed';
-      case 'suspension': return '#fef2f2';
-      default: return '#f9fafb';
+    
+    &::-webkit-scrollbar-thumb {
+        background: rgba(20, 90, 20, 0.6);
+        border-radius: 4px;
     }
-  }};
 `;
 
-export const RecordDescription = styled.p`
-  font-size: 0.875rem;
+export const NextLessons = styled.div`
+    margin: 10px;
+    box-shadow: 0px 0px 10px 0px rgb(20, 90, 20);
+    border-radius: 10px;
+    padding: 24vh 2vh 2vh 2vh;
+    background-color: rgb(31, 31, 31);
+    position: relative;
+    width: 45%;
+    height: 50vh;
+    min-width: 300px;
+    
+    @media (max-width: 900px) {
+        width: 90%;
+        margin: 10px auto;
+    }
+    
+    @media (max-width: 768px) {
+        width: 90%;
+        height: 40vh;
+        margin: 10px auto;
+    }
+    
+    h1 {
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin-left: 5vh;
+        margin-top: 3vh;
+        margin-bottom: 3vh;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0);
+    }
 `;
 
-export const RecordDate = styled.p`
-  font-size: 0.75rem;
-  color: #6b7280;
+export const Title = styled.h1`
+    margin-left: 8vh;
+    margin-top: 3vh;
+    margin-bottom: 4vh;
+    
+    @media (max-width: 768px) {
+        margin-left: 4vh;
+        font-size: 24px;
+    }
 `;
 
-export const EmptyMessage = styled.p`
-  color: #6b7280;
-  font-size: 0.875rem;
+export const RecordsSubTitles = styled.h2`
+    margin-top: 15px;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 `;
 
-export const ErrorMessage = styled.div`
-  padding: 1rem;
-  color: #ef4444;
-  font-weight: bold;
-  font-family: Arial, sans-serif;
-  background-color: #121212; /* Fundo escuro para a mensagem de erro */
+export const Records = styled.div`
+    margin: 10px;
+    box-shadow: 0px 0px 10px 0px rgb(20, 90, 20);
+    border-radius: 10px;
+    padding: 24vh 2vh 2vh 2vh;
+    background-color: rgb(31, 31, 31);
+    position: relative;
+    width: 45%;
+    height: 50vh;
+    min-width: 300px;
+    
+    @media (max-width: 900px) {
+        width: 90%;
+        margin: 10px auto;
+    }
+    
+    @media (max-width: 768px) {
+        width: 90%;
+        height: 40vh;
+        margin: 10px auto;
+    }
+    
+    h1 {
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin-left: 5vh;
+        margin-top: 3vh;
+        margin-bottom: 3vh;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0);
+    }
 `;
 
-export const LoadingMessage = styled.div`
-  padding: 1rem;
-  color: #6b7280;
-  font-family: Arial, sans-serif;
-  background-color: #121212; /* Fundo escuro para a mensagem de carregamento */
+export const Cards = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    
+    @media (max-width: 900px) {
+        flex-direction: column;
+        align-items: center;
+    }
+`;
+
+export const LessonItem = styled.div`
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: rgba(20, 90, 20, 0.1);
+    border-radius: 5px;
+    
+    h2 {
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
+    
+    p {
+        margin: 5px 0;
+    }
+`;
+
+export const RecordItem = styled.div<{ type: 'ocorrencia' | 'advertencia' | 'suspensao' }>`
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: ${props => {
+        switch (props.type) {
+            case 'ocorrencia': return 'rgba(255, 204, 0, 0.2)'; // Amarelo
+            case 'advertencia': return 'rgba(255, 102, 0, 0.2)'; // Laranja
+            case 'suspensao': return 'rgba(255, 0, 0, 0.2)'; // Vermelho
+            default: return 'rgba(255, 255, 255, 0.1)';
+        }
+    }};
+    border-left: 4px solid ${props => {
+        switch (props.type) {
+            case 'ocorrencia': return 'rgb(255, 204, 0)'; // Amarelo
+            case 'advertencia': return 'rgb(255, 102, 0)'; // Laranja
+            case 'suspensao': return 'rgb(255, 0, 0)'; // Vermelho
+            default: return 'rgb(255, 255, 255)';
+        }
+    }};
+    
+    h3 {
+        font-size: 16px;
+        margin-bottom: 5px;
+        color: ${props => {
+            switch (props.type) {
+                case 'ocorrencia': return 'rgb(255, 204, 0)'; // Amarelo
+                case 'advertencia': return 'rgb(255, 102, 0)'; // Laranja
+                case 'suspensao': return 'rgb(255, 0, 0)'; // Vermelho
+                default: return 'white';
+            }
+        }};
+    }
+    
+    p {
+        margin: 5px 0;
+    }
+`;
+
+export const Loading = styled.p`
+    font-size: 32px;
+    text-align: center;
+    margin-top: 20px;
+    color: rgb(41, 72, 30);
+    border-color: #fff;
+    border-radius: 10px;
 `;

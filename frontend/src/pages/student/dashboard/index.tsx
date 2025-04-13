@@ -1,193 +1,212 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import {
-  Container,
-  StudentHeader,
-  StudentName,
-  StudentInfo,
-  GridContainer,
-  Card,
-  CardTitle,
-  ClassList,
-  ClassItem,
-  ClassSubject,
-  ClassInfo,
-  RecordSection,
-  RecordTitle,
-  RecordList,
-  RecordItem,
-  RecordDescription,
-  RecordDate,
-  EmptyMessage,
-  ErrorMessage,
-  LoadingMessage
-} from './styles';
+import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import StudentHeader from "../../../components/header/studentHeader"
+import * as s from "./styles"
+import axios from "axios"
+import { Student } from "../../../types/studentType"
 
-interface Class {
-  id: number;
-  nome: string;
-  date: string;
-  time: string;
-  subject: string;
-  teacher: string;
+interface Records {
+    id: number;
+    responsavel: string;
+    motivo: string;
+    tipo: "ocorrencia" | "suspensao" | "advertencia";
+    data: string;
+    dias?: number;
+    studentid: number;
 }
 
-interface Record {
-  id: number;
-  tipo: string;
-  motivo: string;
-  data: string;
-  studentid: number;
-  dias?: number;
-}
+const apiURL = import.meta.env.VITE_API_URL;
 
 export default function StudentDashboard() {
-  const [aluno, setAluno] = useState<any>(null);
-  const [classes, setClasses] = useState<Class[]>([]);
-  const [records, setRecords] = useState<Record[]>([]);
-  const [erro, setErro] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+    const [aulas, setAulas] = useState<any[]>([])
+    const [aluno, setAluno] = useState<Student | null>(null)
+    const [records, setRecords] = useState<Records[]>([])
+    const [loading, setLoading] = useState<boolean>(true)
+    const navigate = useNavigate()
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Get student information
-        const studentResponse = await axios.get('http://localhost:3000/protected/student/me', {
-          headers: {
-            'x-api-key': import.meta.env.VITE_TOKEN
-          }
-        });
+    const getStudent = async (): Promise<Student | null> => {
+        try {
+            const studentResponse = await axios.get('http://localhost:3000/protected/student/me', {
+                headers: {
+                  'x-api-key': import.meta.env.VITE_TOKEN
+                }
+            });
 
-        if (studentResponse.data.success) {
-          const studentData = studentResponse.data.data;
-          setAluno(studentData);
-
-          // Get upcoming classes
-          const classesResponse = await axios.get(`http://localhost:3000/api/classrooms/${studentData.classroomid}`, {
-            headers: {
-              'x-api-key': import.meta.env.VITE_TOKEN
+            if (studentResponse.data.data) {
+                setAluno(studentResponse.data.data)
+                return studentResponse.data.data;
+            } else {
+                navigate("/");
+                return null;
             }
-          });
-          setClasses(classesResponse.data);
-          console.log("classe:", classesResponse)
-
-          // Get all student records
-          const recordsResponse = await axios.get(`http://localhost:3000/api/students/allrecords/${studentData.id}`, {
-            headers: {
-              'x-api-key': import.meta.env.VITE_TOKEN
-            }
-          });
-          setRecords(recordsResponse.data);
-        } else {
-          setErro("Acesso negado");
+        } catch (error) {
+            console.error(error);
+            navigate("/");
+            return null;
         }
-      } catch (error) {
-        console.error(error);
-        setErro("Erro ao buscar dados");
-      } finally {
-        setLoading(false);
-      }
-    };
+    }
 
-    fetchData();
-  }, []);
+    const getAulas = async () => {
+        try {
+            setLoading(true);
+            const student = await getStudent();
+            if (student) {
+                try {
+                    if (!student.classroomId) {
+                        return setAulas([])
+                    }
+                    const response = await axios.get(`${apiURL}/api/leassons/next/${student.classroomId}`, {
+                        headers: {
+                            'x-api-key': import.meta.env.VITE_TOKEN
+                        }
+                    });
+                    
+                    if (response.data) {
+                        setAulas(response.data);
+                    }
+                } catch (error) {
+                    if (axios.isAxiosError(error) && error.response?.status === 404) {
+                        setAulas([]);
+                        console.log("Nenhuma aula encontrada para esta turma");
+                    } else {
+                        console.error("Erro ao carregar aulas:", error);
+                        alert("Erro ao carregar as aulas");
+                    }
+                }
+            }
+        } finally {
+            setLoading(false);
+        }
+    }
 
-  if (erro) return <ErrorMessage>{erro}</ErrorMessage>;
-  if (loading) return <LoadingMessage>Carregando...</LoadingMessage>;
+    const getRecords = async () => {
+        try {
+            setLoading(true);
+            const student = await getStudent();
 
-  // Filter records by type
-  const warnings = records.filter(record => record.tipo === "advertencia");
-  const occurrences = records.filter(record => record.tipo === "ocorrencia");
-  const suspensions = records.filter(record => record.tipo === "suspensao");
+            if (student) {
+                try {
+                    const response = await axios.get(`${apiURL}/api/students/allrecords/${student.id}`, {
+                        headers: {
+                            'x-api-key': import.meta.env.VITE_TOKEN
+                        }
+                    });
 
-  const classroom = classes.find((classroom) => classroom.id === aluno.classroomId);
+                    if (response.data) {
+                        setRecords(response.data);
+                    }
+                } catch (error) {
+                    if (axios.isAxiosError(error) && error.response?.status === 404) {
+                        setRecords([]);
+                        console.log("Nenhum registro encontrada para este aluno");
+                    } else {
+                        console.error("Erro ao carregar registros:", error);
+                        alert("Erro ao carregar os registros");
+                    }
+                }
+            }
+        } finally {
+            setLoading(false);
+        }
+    }
 
-  return (
-    <Container>
-      {/* Student Header */}
-      <StudentHeader>
-        <StudentName>Olá, {aluno.nome}</StudentName>
-        <StudentInfo>Matrícula: {aluno.matricula}</StudentInfo>
-        <StudentInfo>Turma: {classroom?.nome || "não encontrado"}</StudentInfo>
-      </StudentHeader>
+    // Função para formatar a data
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('pt-BR');
+    }
 
-      <GridContainer>
-        {/* Upcoming Classes */}
-        <Card>
-          <CardTitle>Próximas Aulas</CardTitle>
-          {classes.length > 0 ? (
-            <ClassList>
-              {classes.map((aula) => (
-                <ClassItem key={aula.id}>
-                  <ClassSubject>{aula.subject}</ClassSubject>
-                  <ClassInfo>Professor: {aula.teacher}</ClassInfo>
-                  <ClassInfo>Data: {new Date(aula.date).toLocaleDateString('pt-BR')}</ClassInfo>
-                  <ClassInfo>Horário: {aula.time}</ClassInfo>
-                </ClassItem>
-              ))}
-            </ClassList>
-          ) : (
-            <EmptyMessage>Nenhuma aula programada.</EmptyMessage>
-          )}
-        </Card>
+    useEffect(() => {
+        getAulas();
+        getRecords();
+    }, []);
 
-        {/* Student Records */}
-        <Card>
-          <CardTitle>Registros Disciplinares</CardTitle>
-          
-          {/* Warnings */}
-          <RecordSection>
-            <RecordTitle type="warning">Advertências ({warnings.length})</RecordTitle>
-            {warnings.length > 0 ? (
-              <RecordList>
-                {warnings.map((warning) => (
-                  <RecordItem key={warning.id} type="warning">
-                    <RecordDescription>{warning.motivo}</RecordDescription>
-                    <RecordDate>Data: {new Date(warning.data).toLocaleDateString('pt-BR')}</RecordDate>
-                  </RecordItem>
-                ))}
-              </RecordList>
+    // Filtrar registros por tipo
+    const ocorrencias = records.filter(record => record.tipo === "ocorrencia");
+    const advertencias = records.filter(record => record.tipo === "advertencia");
+    const suspensoes = records.filter(record => record.tipo === "suspensao");
+
+    return (
+        <s.Container>
+            <StudentHeader />
+            {loading ? (
+                <s.Loading>Carregando...</s.Loading>
             ) : (
-              <EmptyMessage>Nenhuma advertência registrada.</EmptyMessage>
+                <>
+                    <s.Title>Olá {aluno?.nome || "não encontrado"}</s.Title>
+                    <s.Cards>
+                        <s.NextLessons>
+                            <h1>Próximas aulas</h1>
+                            <s.CardContent>
+                                {aulas.length > 0 ? (
+                                    aulas.map((aula) => (
+                                        <s.LessonItem key={aula.id}>
+                                            <h2>{aula.titulo}</h2>
+                                            <p>{aula.descricao}</p>
+                                            <p>Data: {formatDate(aula.inicio)}</p>
+                                        </s.LessonItem>
+                                    ))
+                                ) : (
+                                    <p>Nenhuma aula encontrada</p>
+                                )}
+                            </s.CardContent>
+                        </s.NextLessons>
+                        <s.Records>
+                            <h1>Seus registros</h1>
+                            <s.CardContent>
+                                {records.length === 0 ? (
+                                    <p>Nenhum registro encontrado</p>
+                                ) : (
+                                    <>
+                                        {ocorrencias.length > 0 && (
+                                            <>
+                                                <s.RecordsSubTitles>Ocorrências</s.RecordsSubTitles>
+                                                {ocorrencias.map(record => (
+                                                    <s.RecordItem key={record.id} type="ocorrencia">
+                                                        <h3>Ocorrência</h3>
+                                                        <p><strong>Motivo:</strong> {record.motivo}</p>
+                                                        <p><strong>Responsável:</strong> {record.responsavel}</p>
+                                                        <p><strong>Data:</strong> {formatDate(record.data)}</p>
+                                                    </s.RecordItem>
+                                                ))}
+                                            </>
+                                        )}
+                                        
+                                        {advertencias.length > 0 && (
+                                            <>
+                                                <s.RecordsSubTitles>Advertências</s.RecordsSubTitles>
+                                                {advertencias.map(record => (
+                                                    <s.RecordItem key={record.id} type="advertencia">
+                                                        <h3>Advertência</h3>
+                                                        <p><strong>Motivo:</strong> {record.motivo}</p>
+                                                        <p><strong>Responsavel:</strong> {record.responsavel}</p>
+                                                        <p><strong>Data:</strong> {formatDate(record.data)}</p>
+                                                    </s.RecordItem>
+                                                ))}
+                                            </>
+                                        )}
+                                        
+                                        {suspensoes.length > 0 && (
+                                            <>
+                                                <s.RecordsSubTitles>Suspensões</s.RecordsSubTitles>
+                                                {suspensoes.map(record => (
+                                                    <s.RecordItem key={record.id} type="suspensao">
+                                                        <h3>Suspensão</h3>
+                                                        <p><strong>Motivo:</strong> {record.motivo}</p>
+                                                        <p><strong>Responsavel:</strong> {record.responsavel}</p>
+                                                        <p><strong>Data:</strong> {formatDate(record.data)}</p>
+                                                        {record.dias && <p>Dias: {record.dias}</p>}
+                                                    </s.RecordItem>
+                                                ))}
+                                            </>
+                                        )}
+                                    </>
+                                )}
+                            </s.CardContent>
+                        </s.Records>
+                    </s.Cards>
+                </>
             )}
-          </RecordSection>
-          
-          {/* Occurrences */}
-          <RecordSection>
-            <RecordTitle type="occurrence">Ocorrências ({occurrences.length})</RecordTitle>
-            {occurrences.length > 0 ? (
-              <RecordList>
-                {occurrences.map((occurrence) => (
-                  <RecordItem key={occurrence.id} type="occurrence">
-                    <RecordDescription>{occurrence.motivo}</RecordDescription>
-                    <RecordDate>Data: {new Date(occurrence.data).toLocaleDateString('pt-BR')}</RecordDate>
-                  </RecordItem>
-                ))}
-              </RecordList>
-            ) : (
-              <EmptyMessage>Nenhuma ocorrência registrada.</EmptyMessage>
-            )}
-          </RecordSection>
-          
-          {/* Suspensions */}
-          <RecordSection>
-            <RecordTitle type="suspension">Suspensões ({suspensions.length})</RecordTitle>
-            {suspensions.length > 0 ? (
-              <RecordList>
-                {suspensions.map((suspension) => (
-                  <RecordItem key={suspension.id} type="suspension">
-                    <RecordDescription>{suspension.motivo}</RecordDescription>
-                    <RecordDate>Data: {new Date(suspension.data).toLocaleDateString('pt-BR')}</RecordDate>
-                    <p>dias</p>
-                  </RecordItem>
-                ))}
-              </RecordList>
-            ) : (
-              <EmptyMessage>Nenhuma suspensão registrada.</EmptyMessage>
-            )}
-          </RecordSection>
-        </Card>
-      </GridContainer>
-    </Container>
-  );
+        </s.Container>
+    )
 }
