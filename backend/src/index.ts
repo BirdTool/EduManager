@@ -9,10 +9,13 @@ import record from './routes/records';
 import pool from './services/db';
 import search from './routes/search';
 import teacher from './routes/teacher';
+import meRoute from './routes/me';
+import leassons from './routes/classroom/leassons';
+import classrooms from './routes/classroom/classrooms';
 
 // Test database connection
 pool.query('SELECT NOW()')
-  .then(() => console.log('Database connection successful'))
+.then(() => console.log('Database connection successful'))
   .catch(err => {
     console.error('Database connection failed:', err);
     process.exit(1);
@@ -40,11 +43,11 @@ app.use(
 // Middleware para exigir o token principal
 const apiTokenMiddleware = async (c: any, next: () => Promise<void>) => {
   const requestToken = c.req.header('x-api-key') // O token vem no header
-
+  
   if (!requestToken || requestToken !== API_SECRET_KEY) {
     return c.json({ error: 'Acesso negado. Token inválido.' }, 403)
   }
-
+  
   await next() // Se o token estiver certo, continua
 }
 
@@ -53,7 +56,7 @@ app.use('*', apiTokenMiddleware)
 app.use('/protected/*', async (c, next) => {
   const token = c.req.header('Cookie')?.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
   if (!token) return c.json({ success: false, message: 'Nenhum token fornecido' }, 401);
-
+  
   try {
     const decoded = jwt.verify(token, jwt_TOKEN);
     c.set('user', decoded);
@@ -62,6 +65,8 @@ app.use('/protected/*', async (c, next) => {
     return c.json({ success: false, message: 'Token inválido ou expirado' }, 401);
   }
 });
+
+app.route('/protected/student', meRoute);
 
 app.get('/', (c) => {
   return c.text('Hello Hono!')
@@ -75,6 +80,8 @@ app.route('/api', student)
 app.route('/api', record)
 app.route('/api', teacher)
 app.route('/search', search)
+app.route('/api', leassons)
+app.route('/api', classrooms)
 
 app.route('/root', root)
 

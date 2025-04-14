@@ -1,6 +1,7 @@
 import { Context } from 'hono'
 import { PrismaClient } from '@prisma/client'
 import { registerSchemaTeacher } from "../../schemas/registerSchema"
+import createLog from '../../utils/log'
 
 const prisma = new PrismaClient()
 
@@ -16,6 +17,13 @@ export const postTeacher = async (c: Context) => {
         });
 
         if (existingTeacher) {
+            await createLog({
+                title: "Professor já existente",
+                description: `O professor ${name} já existe no sistema ao tentar registrar-se um novo professor.`,
+                userid: existingTeacher.id,
+                table: 'teachers',
+                level: 'error'
+            })
             return c.json({ error: 'Teacher already exists' }, 400);
         }
 
@@ -30,6 +38,14 @@ export const postTeacher = async (c: Context) => {
                 senha: password
             }
         });
+
+        await createLog({
+            title: "Professor criado",
+            description: `O professor ${name} foi criado com sucesso.`,
+            userid: teacher.id,
+            table: 'teachers',
+            level: 'info'
+        })
 
         return c.json({ message: "success to create teacher", success: true, data: teacher }, 201);
     } catch (error) {

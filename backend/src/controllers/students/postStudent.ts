@@ -2,6 +2,7 @@ import { Context } from "hono";
 import { registerSchemaStudent } from "../../schemas/registerSchema";
 import Student from "../../types/studentType";
 import { PrismaClient } from '@prisma/client';
+import createLog from "../../utils/log";
 
 const prisma = new PrismaClient();
 
@@ -73,10 +74,19 @@ export const postStudent = async (c: Context) => {
             }
         });
     
-        if (ifExist.length > 0) return c.json({ 
-            success: false, 
-            message: 'Estudante já cadastrado' 
-        }, 400);
+        if (ifExist.length > 0) {
+            await createLog({
+                title: "Tentativa de cadastrar um estudante já cadastrado",
+                description: `Estudante: ${name} já existe`,
+                userid: ifExist[0].id,
+                table: 'students',
+            })
+
+            return c.json({ 
+                success: false, 
+                message: 'Estudante já cadastrado' 
+            }, 400);
+        }
         
         const currentYear = new Date().getFullYear();
         
@@ -94,14 +104,20 @@ export const postStudent = async (c: Context) => {
                 matricula: 'temporary'
             }
         });
-        
-        // Now update the student with the correct matricula using their actual ID
+
         const updatedStudent = await prisma.students.update({
             where: { id: student.id },
             data: {
                 matricula: `${currentYear}-1-${student.id}`
             }
         });
+
+        await createLog({
+            title: "Estudante cadastrado com sucesso",
+            description: `Estudante: ${name} cadastrado com sucesso`,
+            userid: student.id,
+            table: 'students',
+        })
     
         return c.json({ 
             success: true, 

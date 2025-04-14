@@ -1,5 +1,6 @@
 import { Context } from 'hono'
 import { PrismaClient, Prisma } from '@prisma/client'
+import createLog from '../../utils/log'
 
 const prisma = new PrismaClient()
 
@@ -14,6 +15,12 @@ export const deleteStudent = async (c: Context) => {
         })
 
         if (!existingStudent) {
+            await createLog({
+                title: "Erro ao deletar estudante",
+                description: `O estudante com o id ${studentId} não existe`,
+                table: 'students',
+                level: 'error'
+            })
             return c.json({ message: "Error, this student does not exist" }, 404)
         }
 
@@ -28,6 +35,12 @@ export const deleteStudent = async (c: Context) => {
             await tx.students.delete({
                 where: { id: studentId }
             })
+        })
+
+        await createLog({
+            title: "Estudante deletado",
+            description: `O estudante com o id ${studentId} foi deletado`,
+            table: 'students',
         })
     
         return c.json({ 

@@ -1,5 +1,6 @@
 import { Context } from 'hono'
 import { PrismaClient } from '@prisma/client'
+import createLog from '../../../utils/log';
 
 const prisma = new PrismaClient()
 
@@ -32,6 +33,14 @@ export const postStudent = async (c: Context) => {
                 classroomId: classroomId,
             }
         });
+
+        await createLog({
+            title: 'Adicionar estudante à sala de aula',
+            description: `Estudante ${student.nome} adicionado à sala de aula ${classroom.nome}`,
+            userid: student.id,
+            table: 'students',
+            level: 'info'
+        })
 
         return c.json({ 
             success: true, 

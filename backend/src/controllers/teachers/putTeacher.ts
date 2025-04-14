@@ -1,5 +1,6 @@
 import { Context } from 'hono'
 import { PrismaClient } from '@prisma/client'
+import createLog from '../../utils/log';
 
 const prisma = new PrismaClient()
 
@@ -20,6 +21,12 @@ export const putTeacher = async (c: Context) => {
         });
 
         if (!teacher) {
+            await createLog({
+                title: 'Professor não encontrado',
+                description: `Professor com ID ${id} não foi encontrado ao tentar atualizar os dados do professor`,
+                table: 'teachers',
+                level: 'warn'
+            })
             return c.json({ error: 'Teacher not found' }, 404);
         }
 
@@ -35,6 +42,14 @@ export const putTeacher = async (c: Context) => {
                 senha: password || teacher.senha
             }
         });
+
+        await createLog({
+            title: 'Professor atualizado',
+            description: `O professor ${teacher.nome} foi atualizado com sucesso.`,
+            userid: teacher.id,
+            table: 'teachers',
+            level: 'info'
+        })
 
         return c.json({ message: 'Teacher updated successfully', success: true, data: newTeacher}, 200);
     } catch (error) {

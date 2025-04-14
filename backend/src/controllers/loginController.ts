@@ -3,6 +3,7 @@ import * as jwt from 'jsonwebtoken';
 import pool from '../services/db';
 import * as crypto from 'crypto';
 import { loginSchemaStudent, loginSchemaTeacher, loginSchemaManagement } from '../schemas/loginSchema';
+import createLog from '../utils/log';
 
 const SECRET_KEY: string = process.env.SECRET_KEY as string;
 
@@ -41,15 +42,39 @@ export const loginController = async (c: Context) => {
 
                     if ((nameCheck.rowCount ?? 0) > 0 && (matriculaCheck.rowCount ?? 0) > 0) {
                         // Nome e matrícula existem, mas não correspondem ao mesmo estudante
+                        await createLog({
+                            title: "Tentativa de login com nome e matrícula não correspondentes",
+                            description: `Tentativa de login com nome ${name} e matrícula ${matricula} que não correspondem ao mesmo estudante.`,
+                            table: 'students',
+                            level: 'warn'
+                        })
                         return c.json({ success: false, message: 'Nome e matrícula não correspondem ao mesmo estudante' }, 400);
                     } else if ((nameCheck.rowCount ?? 0) > 0) {
                         // Nome existe, mas a matrícula não corresponde
+                        await createLog({
+                            title: "Tentativa de login mal sucedida, matrícula incorreta",
+                            description: `Tentativa de login com nome ${name} e a matricula: ${matricula} que estava incorreta`,
+                            table: 'students',
+                            level: 'warn'
+                        })
                         return c.json({ success: false, message: 'Matrícula incorreta para o nome fornecido' }, 400);
                     } else if ((matriculaCheck.rowCount ?? 0) > 0) {
                         // Matrícula existe, mas o nome não corresponde
+                        await createLog({
+                            title: "Tentativa de login mal sucedida, nome incorreto",
+                            description: `Tentativa de login com nome ${name} que estava incorreto, e a matricula: ${matricula}`,
+                            table: 'students',
+                            level: 'warn'
+                        })
                         return c.json({ success: false, message: 'Nome incorreto para a matrícula fornecida' }, 400);
                     } else {
                         // Nenhum dos dois existe
+                        await createLog({
+                            title: "Tentativa de login mal sucedida, estudante não encontrado",
+                            description: `Tentativa de login com nome ${name} e matricula ${matricula} que não correspondem a nenhum estudante.`,
+                            table: 'students',
+                            level: 'warn'
+                        })
                         return c.json({ success: false, message: 'Estudante não encontrado' }, 404);
                     }
                 }
@@ -63,7 +88,24 @@ export const loginController = async (c: Context) => {
                 );
 
                 const csrfToken = crypto.randomBytes(32).toString('hex');
-                c.header('Set-Cookie', `token=${token}; HttpOnly; Path=/; SameSite=Strict; Max-Age=3600`); // adicionar Secure após HttpOnly em produção
+                
+                const isProd = process.env.NODE_ENV === 'production';
+                const secureFlag = isProd ? 'Secure;' : '';
+                const sameSite = isProd ? 'None' : 'Lax';
+
+                c.header(
+                'Set-Cookie',
+                `token=${token}; HttpOnly; Path=/; SameSite=${sameSite}; ${secureFlag} Max-Age=3600`
+                );
+                // adicionar Secure após HttpOnly em produção
+
+                await createLog({
+                    title: "Login bem sucedido",
+                    description: `Estudante ${student.nome} com matrícula ${student.matricula} fez login com sucesso.`,
+                    userid: student.id,
+                    table: 'students',
+                })
+
                 return c.json(
                     { success: true, message: 'Login bem-sucedido', data: { name: student.nome, matricula: student.matricula, csrfToken } },
                     200
@@ -88,6 +130,12 @@ export const loginController = async (c: Context) => {
                 );                
 
                 if (teacherCheck.rowCount === 0) {
+                    await createLog({
+                        title: "Tentativa de login mal sucedida, professor não encontrado ou senha incorreta",
+                        description: `Tentativa de login com email ${email} que foi mal sucedida, pois o professor não foi encontrado ou a senha está incorreta`,
+                        table: 'teachers',
+                        level: 'warn'
+                    })
                     return c.json({ success: false, message: 'Professor não encontrado ou senha incorreta' }, 404);
                 }
 
@@ -101,6 +149,14 @@ export const loginController = async (c: Context) => {
 
                 const csrfToken = crypto.randomBytes(32).toString('hex');
                 c.header('Set-Cookie', `token=${token}; HttpOnly; Path=/; SameSite=Strict; Max-Age=3600`); // adicionar Secure após HttpOnly em produção
+                
+                await createLog({
+                    title: "Login bem sucedido",
+                    description: `Professor ${teacher.nome} com email ${teacher.email} fez login com sucesso.`,
+                    userid: teacher.id,
+                    table: 'teachers',
+                })
+                
                 return c.json(
                     { success: true, message: 'Login bem-sucedido', data: { name: teacher.nome, email: teacher.email, csrfToken } },
                     200
@@ -125,6 +181,12 @@ export const loginController = async (c: Context) => {
                 );                
 
                 if (managementCheck.rowCount === 0) {
+                    await createLog({
+                        title: "Tentativa de login mal sucedida, professor não encontrado ou senha incorreta",
+                        description: `Tentativa de login com email ${email} que foi mal sucedida, pois o funcionário não foi encontrado ou a senha está incorreta`,
+                        table: 'management',
+                        level: 'warn'
+                    })
                     return c.json({ success: false, message: 'Professor não encontrado ou senha incorreta' }, 404);
                 }
 
@@ -138,6 +200,14 @@ export const loginController = async (c: Context) => {
 
                 const csrfToken = crypto.randomBytes(32).toString('hex');
                 c.header('Set-Cookie', `token=${token}; HttpOnly; Path=/; SameSite=Strict; Max-Age=3600`); // adicionar Secure após HttpOnly em produção
+                
+                await createLog({
+                    title: "Login bem sucedido",
+                    description: `Funcionário ${management.nome} com email ${management.email} fez login com sucesso.`,
+                    userid: management.id,
+                    table: 'management',
+                })
+                
                 return c.json(
                     { success: true, message: 'Login bem-sucedido', data: { name: management.nome, email: management.email, role: management.cargo, csrfToken } },
                     200

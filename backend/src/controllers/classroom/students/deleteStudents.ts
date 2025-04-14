@@ -1,5 +1,6 @@
 import { Context } from 'hono'
 import { PrismaClient } from '@prisma/client'
+import createLog from '../../../utils/log';
 
 const prisma = new PrismaClient()
 
@@ -39,6 +40,14 @@ export const deleteStudents = async (c: Context) => {
                 classroomId: null,
             }
         });
+
+        await createLog({
+            title: 'Remoção de Estudante da Sala de Aula',
+            description: `Estudante ${student.nome} removido da sala de aula ${classroom.nome}`,
+            userid: student.id,
+            table: 'students',
+            level: 'info'
+        })
 
         return c.json({ 
             success: true, 

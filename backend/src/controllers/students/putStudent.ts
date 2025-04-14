@@ -1,5 +1,6 @@
 import { Context } from "hono";
 import { PrismaClient } from '@prisma/client';
+import createLog from "../../utils/log";
 
 const prisma = new PrismaClient();
 
@@ -18,6 +19,11 @@ export const putStudent = async (c: Context) => {
         });
 
         if (!existingStudent) {
+            await createLog({
+                title: "Tentativa de atualizar um estudante não cadastrado",
+                description: `Estudante: ${name} não existe`,
+                table: 'students',
+            })
             return c.json({ success: false, message: 'Estudante não encontrado' }, 404);
         }
 
@@ -37,6 +43,13 @@ export const putStudent = async (c: Context) => {
                 matricula: matricula || existingStudent.matricula
             }
         });
+
+        await createLog({
+            title: "Estudante atualizado com sucesso",
+            description: `Estudante: ${name} atualizado com sucesso`,
+            userid: existingStudent.id,
+            table: 'students',
+        })
 
         return c.json({ 
             success: true, 

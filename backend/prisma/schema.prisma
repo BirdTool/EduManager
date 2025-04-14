@@ -94,3 +94,13 @@ model absences {
   lesson      lessons    @relation(fields: [lessonId], references: [id])
   student     students   @relation(fields: [studentId], references: [id])
 }
+
+model logs {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String
+  userid      Int?
+  table       String?
+  level       String
+  date        DateTime @default(now())
+}

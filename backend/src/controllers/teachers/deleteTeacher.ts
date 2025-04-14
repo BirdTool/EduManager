@@ -1,5 +1,6 @@
 import { Context } from 'hono'
 import { PrismaClient } from '@prisma/client'
+import createLog from '../../utils/log';
 
 const prisma = new PrismaClient()
 
@@ -16,6 +17,12 @@ export const deleteTeacher = async (c: Context) => {
         });
 
         if (!teacher) {
+            await createLog({
+                title: 'Professor não encontrado ao tentar deletar',
+                description: `Foi tentado deletar o professor com ID ${id} mas o mesmo não foi encontrado`,
+                table: 'teachers',
+                level: 'error'
+            });
             return c.json({ error: 'Teacher not found' }, 404);
         }
 
@@ -23,6 +30,13 @@ export const deleteTeacher = async (c: Context) => {
             where: { id }
         });
 
+        await createLog({
+            title: 'Professor deletado',
+            description: `Professor ${teacher.nome} deletado com sucesso`,
+            userid: teacher.id,
+            table: 'teachers',
+            level: 'info'
+        });
         return c.json({ message: 'Teacher deleted successfully', success: true, data: oldTeacher }, 200);
     } catch (error) {
         console.error(error);

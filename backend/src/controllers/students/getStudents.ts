@@ -1,5 +1,6 @@
 import { Context } from "hono";
 import { PrismaClient } from '@prisma/client';
+import createLog from "../../utils/log";
 
 const prisma = new PrismaClient();
 
@@ -18,6 +19,12 @@ export const getStudents = async (c: Context) => {
     
             if (!student) return c.json({ message: "Error, this student does not existing" }, 404);
     
+            await createLog({
+                title: "Estudante encontrado",
+                description: `Estudante encontrado com o ID ${idNumber}`,
+                userid: idNumber,
+                table: 'students',
+            })
             return c.json(student);
         }
     
